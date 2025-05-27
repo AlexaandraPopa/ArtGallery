@@ -65,20 +65,17 @@
     }
   }
 
-  // Selectăm formularul de upload
   const form = document.querySelector('form');
 form.addEventListener('submit', function(e) {
-  e.preventDefault(); // prevenim submit-ul normal temporar pentru demo
+  e.preventDefault(); 
 
-  // Delay înainte să înceapă confetti-ul (ex: 1500 ms)
   setTimeout(() => {
     createConfetti();
-  }, 1500); // poți schimba între 1000-2000 după preferință
+  }, 1500); 
 
-  // Submit real după un total de ~3 secunde
   setTimeout(() => {
     form.submit();
-  }, 3500); // 1500 + 2000 = 3.5s, sau ajustează cum vrei
+  }, 3500); 
 });
 
 </script>
