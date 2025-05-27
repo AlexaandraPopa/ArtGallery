@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Galerie - Studioul de Pictură</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="supabase-config.js"></script>
+  <style>
+    .gallery-controls {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    #search {
+      padding: 0.5rem;
+      font-size: 1rem;
+      width: 250px;
+    }
+
+    #sort {
+      padding: 0.5rem;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Studioul de Pictură</h1>
+    <nav>
+      <a href="index.html">Acasă</a>
+      <a href="paintings.html">Picturi</a>
+      <a href="upload.html">Încarcă</a>
+      <a href="about.html">Despre</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="gallery-header">
+  <h2>Galerie de Tablouri</h2>
+  <div class="gallery-controls">
+    <input type="text" id="search" placeholder="Caută tablou, artist sau descriere..." />
+    <select id="sort">
+      <option value="date-desc">Cele mai noi</option>
+      <option value="date-asc">Cele mai vechi</option>
+      <option value="name-asc">Nume A-Z</option>
+      <option value="name-desc">Nume Z-A</option>
+    </select>
+  </div>
+</div>
+
+    <section id="gallery" class="gallery"></section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Studioul de Pictură. Toate drepturile rezervate.</p>
+  </footer>
+
+  <script>
+    let tablouri = [];
+
+    async function loadGallery() {
+      const { data, error } = await supabase.from('tablouri').select('*');
+      if (error) {
+        document.getElementById('gallery').innerHTML = '<p>Eroare la încărcare.</p>';
+        return;
+      }
+      tablouri = data;
+      updateGallery();
+    }
+
+    function updateGallery() {
+      const gallery = document.getElementById('gallery');
+      const search = document.getElementById('search').value.toLowerCase();
+      const sort = document.getElementById('sort').value;
+
+      let filtered = tablouri.filter(t =>
+        t.nume_tablou.toLowerCase().includes(search) ||
+        t.nume_proprietar.toLowerCase().includes(search) ||
+        (t.descriere && t.descriere.toLowerCase().includes(search))
+      );
+
+      if (sort === 'date-desc') {
+        filtered.sort((a, b) => new Date(b.data) - new Date(a.data));
+      } else if (sort === 'date-asc') {
+        filtered.sort((a, b) => new Date(a.data) - new Date(b.data));
+      } else if (sort === 'name-asc') {
+        filtered.sort((a, b) => a.nume_tablou.localeCompare(b.nume_tablou));
+      } else if (sort === 'name-desc') {
+        filtered.sort((a, b) => b.nume_tablou.localeCompare(a.nume_tablou));
+      }
+
+      gallery.innerHTML = '';
+      if (filtered.length === 0) {
+        gallery.innerHTML = '<p>Niciun rezultat găsit.</p>';
+        return;
+      }
+
+      filtered.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'painting-card';
+        const dataFormata = new Date(item.data).toLocaleDateString('ro-RO');
+        card.innerHTML = `
+          <img src="${item.poza_url}" alt="${item.nume_tablou}" />
+          <h3>${item.nume_tablou}</h3>
+          <p><strong>Artist:</strong> ${item.nume_proprietar}</p>
+          <p>${item.descriere}</p>
+          <p class="data">Încărcat la: ${dataFormata}</p>
+          <button onclick="copyPhone('${item.nr_telefon}')">📞 Contact</button>
+        `;
+        gallery.appendChild(card);
+      });
+    }
+
+    function copyPhone(nr) {
+      navigator.clipboard.writeText(nr).then(() => {
+        alert("Numărul de telefon a fost copiat în clipboard: " + nr);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadGallery();
+      document.getElementById('search').addEventListener('input', updateGallery);
+      document.getElementById('sort').addEventListener('change', updateGallery);
+    });
+  </script>
+</body>
+</html>

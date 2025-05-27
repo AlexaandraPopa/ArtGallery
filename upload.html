@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Încarcă - Studioul de Pictură</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Studioul de Pictură</h1>
+    <nav>
+      <a href="index.html">Acasă</a>
+      <a href="paintings.html">Picturi</a>
+      <a href="upload.html">Încarcă</a>
+      <a href="about.html">Despre</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="upload-container">
+    <h2>Încarcă un tablou</h2>
+    <form class="uploadForm" id="uploadForm">
+      <input type="text" name="nume_proprietar" placeholder="Nume Proprietar" required>
+      <input type="text" name="nume_tablou" placeholder="Nume Tablou" required>
+      <textarea name="descriere" placeholder="Descriere" required></textarea>
+      <input type="tel" name="nr_telefon" placeholder="Nr. Telefon" required>
+      <input type="file" name="poza" accept="image/*" required>
+      <button type="submit">Încarcă</button>
+    </form>
+    </div>
+    <p id="status"></p>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Studioul de Pictură. Toate drepturile rezervate.</p>
+    <div id="confetti-container"></div>
+
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="supabase-config.js"></script>
+  <script src="upload.js"></script>
+
+  <script>
+  const colors = ['#c9a96e', '#f2d398', '#d7c89e', '#a68a4e', '#fff'];
+  const confettiCount = 50; // mai multe particule
+  const confettiContainer = document.getElementById('confetti-container');
+
+  function createConfetti() {
+    for (let i = 0; i < confettiCount; i++) {
+      const confetti = document.createElement('div');
+      confetti.classList.add('confetti');
+      confetti.style.left = Math.random() * 100 + 'vw';
+      confetti.style.top = '-10px';
+      confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      confetti.style.animationDuration = (3 + Math.random() * 3) + 's';
+      confetti.style.animationDelay = (Math.random() * 0.5) + 's';
+      confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+      confettiContainer.appendChild(confetti);
+
+      confetti.addEventListener('animationend', () => {
+        confetti.remove();
+      });
+    }
+  }
+
+  // Selectăm formularul de upload
+  const form = document.querySelector('form');
+form.addEventListener('submit', function(e) {
+  e.preventDefault(); // prevenim submit-ul normal temporar pentru demo
+
+  // Delay înainte să înceapă confetti-ul (ex: 1500 ms)
+  setTimeout(() => {
+    createConfetti();
+  }, 1500); // poți schimba între 1000-2000 după preferință
+
+  // Submit real după un total de ~3 secunde
+  setTimeout(() => {
+    form.submit();
+  }, 3500); // 1500 + 2000 = 3.5s, sau ajustează cum vrei
+});
+
+</script>
+
+</body>
+</html>
